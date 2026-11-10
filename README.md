@@ -62,12 +62,14 @@ Before plugging in the USB-C cable, use a multimeter in continuity mode to make 
 
 **BOM:**
 
-| Item                         | Qty | Supplier   | Cost/item | Total Cost | Link |
-|------------------------------|-----|------------|-----------|------------|------|
-| ESP32-S3-Zero                | 1   | AliExpress | $4.32     | $4.32      | [AliExpress](https://www.aliexpress.us/item/3256807949476561.html) |
-| EC11 Rotary Encoder 20mm     | 1   | AliExpress | $3.36     | $3.36      | [AliExpress](https://www.aliexpress.us/item/3256808530463909.html) |
-| SK6812 MINI-E NeoPixels      | 1   | AliExpress | $2.54     | $2.54      | [AliExpress](https://www.aliexpress.us/item/3256805007401420.html) |
-| 45mm Slide Potentiometer B10K | 1  | AliExpress | $5.07     | $5.07      | [AliExpress](https://www.aliexpress.us/item/3256808872395865.html) |
-| PCB                          | 1   | JLCPCB     | $8.37     | $8.37      | [JLCPCB](https://jlcpcb.com/) |
-| Estimated total shipping     | 1   ||| $0.00      ||
-| **Estimated Total**          |     |            |           | **$23.66** | |
+| Item | Qty | Supplier | Cost/item | Total cost | Link |
+| --- | ---: | --- | ---: | ---: | --- |
+| ESP32-S3-Zero | 1 | AliExpress | $4.32 | $4.32 | [AliExpress](https://www.aliexpress.us/item/3256807949476561.html) |
+| EC11 Rotary Encoder 20mm (5-pack) | 1 | AliExpress | $3.36 | $3.36 | [AliExpress](https://www.aliexpress.us/item/3256808530463909.html) |
+| SK6812 MINI-E NeoPixels (20-pack) | 1 | AliExpress | $2.54 | $2.54 | [AliExpress](https://www.aliexpress.us/item/3256805007401420.html) |
+| 45mm Slide Potentiometer B10K (5-pack) | 1 | AliExpress | $5.13 | $5.13 | [AliExpress](https://www.aliexpress.us/item/3256808872395865.html) |
+| PCB | 1 | JLCPCB | $4.00 | $4.00 | [JLCPCB](https://jlcpcb.com/) |
+| Shipping (AliExpress Choice) | — | AliExpress | — | $0.00 | — |
+| Shipping (JLCPCB Global Standard Direct Line) | — | JLCPCB | — | $8.37 | — |
+| Estimated sales tax (8.125% on AliExpress parts) | — | — | — | $1.25 | — |
+| **Estimated total** |  |  |  | **$28.97** |  |
