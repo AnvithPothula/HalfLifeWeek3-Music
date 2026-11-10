@@ -2542,7 +2542,7 @@
 		(property "Reference" "U1"
 			(at 11 -9 0)
 			(layer "F.SilkS")
-			(uuid "f01e52a1-ecd1-45d2-a047-b9b62d4d2247")
+			(uuid "e933aa02-4bed-4fbf-9319-5fb8697771d9")
 			(effects
 				(font
 					(size 1 1)
@@ -2553,7 +2553,7 @@
 		(property "Value" "Waveshare ESP32-S3-ZERO"
 			(at -0.5 13 0)
 			(layer "F.Fab")
-			(uuid "cecf6103-2358-4472-9b9d-593ff58d66e4")
+			(uuid "a25f84fb-f03a-43d5-b628-9e48d742b5ab")
 			(effects
 				(font
 					(size 1 1)
@@ -2565,7 +2565,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "e725aad8-74d2-4d4b-9264-0c2829111531")
+			(uuid "b03caf77-f596-4685-97c8-c752c69e472b")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2576,7 +2576,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "5b763ab0-b1f8-42cf-84ac-31d8781c77ea")
+			(uuid "1114451e-a940-430e-86f0-06f42ab35952")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5145,7 +5145,7 @@
 		)
 	)
 	(gr_rect
-		(start 105 46.5)
+		(start 105 47)
 		(end 194.5 134)
 		(radius 3)
 		(stroke
