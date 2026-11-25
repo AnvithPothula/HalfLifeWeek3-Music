@@ -22,36 +22,36 @@ const uint8_t TOUCH_BASE_NOTES[7] = {60, 62, 64, 65, 67, 69, 71}; // C4-B4
 
 Adafruit_NeoPixel pixels(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800); // neopixels
 
-uint32_t touchBaselines[7] = {0};
-int touchPlaying[7] = {-1, -1, -1, -1, -1, -1, -1}; // -1 = not playing
+uint32_t touchBase[7] = {0};
+int playing[7] = {-1, -1, -1, -1, -1, -1, -1}; // -1 = not playing
 
-int octaveOffset = 0; // clamped b/w -4 and +4
-int modCCValue   = 0; // clamped b/w 0 and 127
-int lastSliderVal = -1;
+int octave = 0; // clamped b/w -4 and +4
+int modVal   = 0; // clamped b/w 0 and 127
+int lastSlider = -1;
 
 int lastEnc1A = HIGH;
-bool enc1SwWasPressed = false;
-unsigned long lastEnc1SwTime = 0;
+bool sw1Was = false;
+unsigned long sw1Time = 0;
 
 int lastEnc2A = HIGH;
-bool enc2SwWasPressed = false;
-unsigned long lastEnc2SwTime = 0;
+bool sw2Was = false;
+unsigned long sw2Time = 0;
 
 // update neopixel colors
 void updateLEDs() {
-  bool anyKeyPressed = false;
+  bool anyKey = false;
   for (int i = 0; i < 7; i++) {
-    if (touchPlaying[i] != -1) {
-      anyKeyPressed = true;
+    if (playing[i] != -1) {
+      anyKey = true;
       break;
     }
   }
 
   uint32_t color = 0;
-  if (anyKeyPressed) {
+  if (anyKey) {
     color = pixels.Color(255, 255, 255); // flash white when a key pressed
   } else {
-    switch (octaveOffset) {
+    switch (octave) {
       case -4: color = pixels.Color(0, 0, 128);   break; // deep blue
       case -3: color = pixels.Color(0, 0, 255);   break; // blue
       case -2: color = pixels.Color(0, 128, 255); break; // sky blue
@@ -99,7 +99,7 @@ void setup() {
       sum += touchRead(TOUCH_PINS[i]);
       delay(5);
     }
-    touchBaselines[i] = sum / 16;
+    touchBase[i] = sum / 16;
   }
 
   MIDI.begin();
@@ -112,75 +112,75 @@ void loop() {
   unsigned long now = millis();
 
   // read encoder 1 (the octave shift one)
-  int currentEnc1A = digitalRead(ENC1_A_PIN);
-  if (currentEnc1A != lastEnc1A && currentEnc1A == LOW) {
-    if (digitalRead(ENC1_B_PIN) != currentEnc1A) {
-      octaveOffset = min(4, octaveOffset + 1);
+  int enc1A = digitalRead(ENC1_A_PIN);
+  if (enc1A != lastEnc1A && enc1A == LOW) {
+    if (digitalRead(ENC1_B_PIN) != enc1A) {
+      octave = min(4, octave + 1);
     } else {
-      octaveOffset = max(-4, octaveOffset - 1);
+      octave = max(-4, octave - 1);
     }
     updateLEDs();
   }
-  lastEnc1A = currentEnc1A;
+  lastEnc1A = enc1A;
 
   // clicking encoder 1 (resets octave to 0)
-  bool enc1Pressed = (digitalRead(ENC1_SW_PIN) == LOW);
-  if (enc1Pressed && !enc1SwWasPressed && (now - lastEnc1SwTime > 50)) {
-    octaveOffset = 0;
+  bool sw1 = (digitalRead(ENC1_SW_PIN) == LOW);
+  if (sw1 && !sw1Was && (now - sw1Time > 50)) {
+    octave = 0;
     updateLEDs();
-    enc1SwWasPressed = true;
-    lastEnc1SwTime = now;
-  } else if (!enc1Pressed && (now - lastEnc1SwTime > 50)) {
-    enc1SwWasPressed = false;
+    sw1Was = true;
+    sw1Time = now;
+  } else if (!sw1 && (now - sw1Time > 50)) {
+    sw1Was = false;
   }
 
   // read encoder 2 (the mod wheel one)
-  int currentEnc2A = digitalRead(ENC2_A_PIN);
-  if (currentEnc2A != lastEnc2A && currentEnc2A == LOW) {
-    if (digitalRead(ENC2_B_PIN) != currentEnc2A) {
-      modCCValue = min(127, modCCValue + 4);
+  int enc2A = digitalRead(ENC2_A_PIN);
+  if (enc2A != lastEnc2A && enc2A == LOW) {
+    if (digitalRead(ENC2_B_PIN) != enc2A) {
+      modVal = min(127, modVal + 4);
     } else {
-      modCCValue = max(0, modCCValue - 4);
+      modVal = max(0, modVal - 4);
     }
-    MIDI.controlChange(1, modCCValue, 1);
+    MIDI.controlChange(1, modVal, 1);
   }
-  lastEnc2A = currentEnc2A;
+  lastEnc2A = enc2A;
 
   // clicking encoder 2 (resets modulation to 0)
-  bool enc2Pressed = (digitalRead(ENC2_SW_PIN) == LOW);
-  if (enc2Pressed && !enc2SwWasPressed && (now - lastEnc2SwTime > 50)) {
-    modCCValue = 0;
-    MIDI.controlChange(1, modCCValue, 1);
-    enc2SwWasPressed = true;
-    lastEnc2SwTime = now;
-  } else if (!enc2Pressed && (now - lastEnc2SwTime > 50)) {
-    enc2SwWasPressed = false;
+  bool sw2 = (digitalRead(ENC2_SW_PIN) == LOW);
+  if (sw2 && !sw2Was && (now - sw2Time > 50)) {
+    modVal = 0;
+    MIDI.controlChange(1, modVal, 1);
+    sw2Was = true;
+    sw2Time = now;
+  } else if (!sw2 && (now - sw2Time > 50)) {
+    sw2Was = false;
   }
 
   // scan keys
   for (int i = 0; i < 7; i++) {
-    uint32_t reading = touchRead(TOUCH_PINS[i]);
-    bool isTouched = (reading > (touchBaselines[i] + (touchBaselines[i] / 4)));
+    uint32_t rd = touchRead(TOUCH_PINS[i]);
+    bool touched = (rd > (touchBase[i] + (touchBase[i] / 4)));
 
-    if (isTouched && touchPlaying[i] == -1) {
-      int note = TOUCH_BASE_NOTES[i] + (octaveOffset * 12);
+    if (touched && playing[i] == -1) {
+      int note = TOUCH_BASE_NOTES[i] + (octave * 12);
       note = max(0, min(127, note));
       MIDI.noteOn(note, 127, 1);
-      touchPlaying[i] = note;
+      playing[i] = note;
       updateLEDs();
-    } else if (!isTouched && touchPlaying[i] != -1) {
-      MIDI.noteOff(touchPlaying[i], 0, 1);
-      touchPlaying[i] = -1;
+    } else if (!touched && playing[i] != -1) {
+      MIDI.noteOff(playing[i], 0, 1);
+      playing[i] = -1;
       updateLEDs();
     }
   }
 
   // reads volume slider
-  int rawSlider = analogRead(SLIDER_PIN); // 0-4095
-  int sliderCC = rawSlider >> 5;
-  if (abs(sliderCC - lastSliderVal) > 1) {
-    MIDI.controlChange(7, sliderCC, 1);
-    lastSliderVal = sliderCC;
+  int raw = analogRead(SLIDER_PIN); // 0-4095
+  int cc = raw >> 5;
+  if (abs(cc - lastSlider) > 1) {
+    MIDI.controlChange(7, cc, 1);
+    lastSlider = cc;
   }
 
   delay(2);
