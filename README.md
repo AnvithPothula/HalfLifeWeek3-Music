@@ -41,12 +41,9 @@ I made this project to get more experience with KiCad PCB design (specifically w
 You can flash this board using the Arduino IDE (or CircuitPython/KMK):
 
 1. Install the Arduino IDE.
-2. In the Boards Manager, install the ESP32 boards package by Espressif and select Waveshare ESP32-S3-Zero (or ESP32S3 Dev Module) as your board.
-3. Under the Tools menu, set USB Mode to USB-OTG (TinyUSB) and USB CDC On Boot to Enabled so the board is recognized as a native USB MIDI device.
-4. Install these libraries in the Library Manager:
-   * Adafruit TinyUSB Library (or Control Surface / MIDI library)
-   * Adafruit NeoPixel
-   * ESP32Encoder
+2. In the Boards Manager, install esp32 by Espressif Systems and select ESP32S3 Dev Module as your board.
+3. Under the Tools menu, set USB Mode to USB-OTG (TinyUSB) so the board shows up as a USB MIDI device.
+4. Install Adafruit NeoPixel in the Library Manager.
 5. Open midi-keyboard-arduino/midi-keyboard-arduino.ino, plug the board into your computer via USB-C, and click Upload. If it doesn't upload automatically, hold the BOOT button on the ESP32-S3-Zero, tap RESET, and release BOOT to enter bootloader mode.
 
 **2. How to assemble the board**
@@ -67,9 +64,10 @@ Before plugging in the USB-C cable, use a multimeter in continuity mode to make 
 | ESP32-S3-Zero | 1 | AliExpress | $4.32 | $4.32 | [AliExpress](https://www.aliexpress.us/item/3256807949476561.html) |
 | EC11 Rotary Encoder 20mm (5-pack) | 1 | AliExpress | $3.36 | $3.36 | [AliExpress](https://www.aliexpress.us/item/3256808530463909.html) |
 | SK6812 MINI-E NeoPixels (20-pack) | 1 | AliExpress | $2.54 | $2.54 | [AliExpress](https://www.aliexpress.us/item/3256805007401420.html) |
-| 45mm Slide Potentiometer B10K (5-pack) | 1 | AliExpress | $5.13 | $5.13 | [AliExpress](https://www.aliexpress.us/item/3256808872395865.html) |
+| Bourns PTA1543-2015CPB103 Slide Potentiometer (10k linear, 15mm travel) | 1 | DigiKey | $1.58 | $1.58 | [DigiKey](https://www.digikey.com/en/products/detail/bourns-inc/PTA1543-2015CPB103/3781165) |
 | PCB | 1 | JLCPCB | $4.00 | $4.00 | [JLCPCB](https://jlcpcb.com/) |
 | Shipping (AliExpress Choice) | — | AliExpress | — | $0.00 | — |
 | Shipping (JLCPCB Global Standard Direct Line) | — | JLCPCB | — | $8.37 | — |
-| Estimated sales tax (8.125% on AliExpress parts) | — | — | — | $1.25 | — |
-| **Estimated total** |  |  |  | **$28.97** |  |
+| Shipping (DigiKey standard) | — | DigiKey | — | $4.99 | — |
+| Estimated sales tax (8.125% on AliExpress and DigiKey parts) | — | — | — | $0.96 | — |
+| **Estimated total** |  |  |  | **$30.12** |  |

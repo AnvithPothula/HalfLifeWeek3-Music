@@ -6,6 +6,8 @@
 USBMIDI MIDI;
 
 const int SLIDER_PIN = 1;
+const bool USE_SLIDER = true;
+const int SLIDER_SAMPLES = 8;
 const int LED_PIN    = 2;
 const int NUM_LEDS   = 3;
 
@@ -29,13 +31,38 @@ int octave = 0; // clamped b/w -4 and +4
 int modVal   = 0; // clamped b/w 0 and 127
 int lastSlider = -1;
 
-int lastEnc1A = HIGH;
 bool sw1Was = false;
 unsigned long sw1Time = 0;
 
-int lastEnc2A = HIGH;
 bool sw2Was = false;
 unsigned long sw2Time = 0;
+
+// 4 steps = 1 click
+const int8_t ENC_TABLE[16] = {0,-1,1,0, 1,0,0,-1, -1,0,0,1, 0,1,-1,0};
+volatile int32_t enc1Raw = 0;
+volatile int32_t enc2Raw = 0;
+volatile uint8_t enc1State = 0;
+volatile uint8_t enc2State = 0;
+int32_t enc1Used = 0;
+int32_t enc2Used = 0;
+
+void IRAM_ATTR onEnc1Change() {
+  uint8_t ab = (digitalRead(ENC1_A_PIN) << 1) | digitalRead(ENC1_B_PIN);
+  enc1State = ((enc1State << 2) | ab) & 0x0F;
+  enc1Raw += ENC_TABLE[enc1State];
+}
+
+void IRAM_ATTR onEnc2Change() {
+  uint8_t ab = (digitalRead(ENC2_A_PIN) << 1) | digitalRead(ENC2_B_PIN);
+  enc2State = ((enc2State << 2) | ab) & 0x0F;
+  enc2Raw += ENC_TABLE[enc2State];
+}
+
+int readClicks(volatile int32_t &raw, int32_t &used) {
+  int32_t n = (raw - used) / 4;
+  used += n * 4;
+  return (int)n;
+}
 
 // update neopixel colors
 void updateLEDs() {
@@ -76,13 +103,17 @@ void setup() {
   pinMode(ENC1_A_PIN, INPUT_PULLUP);
   pinMode(ENC1_B_PIN, INPUT_PULLUP);
   pinMode(ENC1_SW_PIN, INPUT_PULLUP);
-  lastEnc1A = digitalRead(ENC1_A_PIN);
+  enc1State = (digitalRead(ENC1_A_PIN) << 1) | digitalRead(ENC1_B_PIN);
+  attachInterrupt(digitalPinToInterrupt(ENC1_A_PIN), onEnc1Change, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENC1_B_PIN), onEnc1Change, CHANGE);
 
   // encoder 2
   pinMode(ENC2_A_PIN, INPUT_PULLUP);
   pinMode(ENC2_B_PIN, INPUT_PULLUP);
   pinMode(ENC2_SW_PIN, INPUT_PULLUP);
-  lastEnc2A = digitalRead(ENC2_A_PIN);
+  enc2State = (digitalRead(ENC2_A_PIN) << 1) | digitalRead(ENC2_B_PIN);
+  attachInterrupt(digitalPinToInterrupt(ENC2_A_PIN), onEnc2Change, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENC2_B_PIN), onEnc2Change, CHANGE);
 
   // slider res (12-bit: 0-4095)
   analogReadResolution(12);
@@ -112,16 +143,11 @@ void loop() {
   unsigned long now = millis();
 
   // read encoder 1 (the octave shift one)
-  int enc1A = digitalRead(ENC1_A_PIN);
-  if (enc1A != lastEnc1A && enc1A == LOW) {
-    if (digitalRead(ENC1_B_PIN) != enc1A) {
-      octave = min(4, octave + 1);
-    } else {
-      octave = max(-4, octave - 1);
-    }
+  int clicks1 = readClicks(enc1Raw, enc1Used);
+  if (clicks1 != 0) {
+    octave = constrain(octave + clicks1, -4, 4);
     updateLEDs();
   }
-  lastEnc1A = enc1A;
 
   // clicking encoder 1 (resets octave to 0)
   bool sw1 = (digitalRead(ENC1_SW_PIN) == LOW);
@@ -135,16 +161,11 @@ void loop() {
   }
 
   // read encoder 2 (the mod wheel one)
-  int enc2A = digitalRead(ENC2_A_PIN);
-  if (enc2A != lastEnc2A && enc2A == LOW) {
-    if (digitalRead(ENC2_B_PIN) != enc2A) {
-      modVal = min(127, modVal + 4);
-    } else {
-      modVal = max(0, modVal - 4);
-    }
+  int clicks2 = readClicks(enc2Raw, enc2Used);
+  if (clicks2 != 0) {
+    modVal = constrain(modVal + clicks2 * 4, 0, 127);
     MIDI.controlChange(1, modVal, 1);
   }
-  lastEnc2A = enc2A;
 
   // clicking encoder 2 (resets modulation to 0)
   bool sw2 = (digitalRead(ENC2_SW_PIN) == LOW);
@@ -176,11 +197,18 @@ void loop() {
   }
 
   // reads volume slider
-  int raw = analogRead(SLIDER_PIN); // 0-4095
-  int cc = raw >> 5;
-  if (abs(cc - lastSlider) > 1) {
-    MIDI.controlChange(7, cc, 1);
-    lastSlider = cc;
+  if (USE_SLIDER) {
+    int raw = 0;
+    for (int i = 0; i < SLIDER_SAMPLES; i++) {
+      raw += analogRead(SLIDER_PIN); // 0-4095
+    }
+    raw /= SLIDER_SAMPLES;
+    int cc = 127 - (raw >> 5); // 0-127, top of the slider = 127
+    bool atEnd = (cc == 0 || cc == 127);
+    if (abs(cc - lastSlider) > 1 || (atEnd && cc != lastSlider)) {
+      MIDI.controlChange(7, cc, 1);
+      lastSlider = cc;
+    }
   }
 
   delay(2);
