@@ -68,6 +68,7 @@ Before plugging in the USB-C cable, use a multimeter in continuity mode to make 
 | PCB | 1 | JLCPCB | $4.00 | $4.00 | [JLCPCB](https://jlcpcb.com/) |
 | Shipping (AliExpress Choice) | — | AliExpress | — | $0.00 | — |
 | Shipping (JLCPCB Global Standard Direct Line) | — | JLCPCB | — | $8.37 | — |
-| Shipping (DigiKey standard) | — | DigiKey | — | $4.99 | — |
+| Shipping (DigiKey, USPS Ground Advantage) | — | DigiKey | — | $4.99 | — |
+| Tariff (DigiKey estimate) | — | DigiKey | — | $0.55 | — |
 | Estimated sales tax (8.125% on AliExpress and DigiKey parts) | — | — | — | $0.96 | — |
-| **Estimated total** |  |  |  | **$30.12** |  |
+| **Estimated total** |  |  |  | **$30.67** |  |
